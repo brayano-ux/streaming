@@ -1,0 +1,39 @@
+<div class="page-header">
+  <h1>Notes de l'élève</h1>
+  <a routerLink="/dashboard/notes" class="btn-secondary">Retour</a>
+</div>
+
+@if (loading()) {
+<p>Chargement...</p>
+} @else if (errorMessage()) {
+<div class="alert-error">{{ errorMessage() }}</div>
+} @else if (eleve(); as e) {
+<div class="detail-card">
+  <h2>{{ e.prenom }} {{ e.nom }}</h2>
+  <p>Matricule : {{ e.matricule }}</p>
+</div>
+
+@if (notesParMatiere().length === 0) {
+<p class="empty-state">Aucune note enregistrée pour cet élève.</p>
+} @else {
+@for (groupe of notesParMatiere(); track groupe.matiere) {
+<div class="matiere-block">
+  <h3>{{ groupe.matiere }} (coef. {{ groupe.coefficient }})</h3>
+  <table class="data-table">
+    <thead>
+    <tr><th>Séquence</th><th>Note</th><th>Année</th></tr>
+    </thead>
+    <tbody>
+    @for (note of groupe.notes; track note.id) {
+    <tr>
+      <td>{{ note.sequence }}</td>
+      <td>{{ note.valeur }}/20</td>
+      <td>{{ note.anneeScolaire }}</td>
+    </tr>
+    }
+    </tbody>
+  </table>
+</div>
+}
+}
+}

@@ -1,0 +1,23 @@
+<div class="auth-shell flex min-h-screen flex-col lg:flex-row">
+
+  <!-- bandeau mobile : copie le bloc lg:hidden du fichier -->
+
+  <aside class="auth-brand relative hidden w-[42%] flex-col justify-between overflow-hidden px-14 py-16 lg:flex"
+         style="background:linear-gradient(175deg, #12213C 0%, #0B1830 100%);">
+    <div class="brand-lines absolute inset-0"></div>
+    <div class="brand-mark relative z-10 flex items-center gap-4">
+      <!-- sceau ÉN -->
+    </div>
+    <div class="relative z-10 max-w-sm pl-4">
+      <p class="brand-quote font-display text-[22px] italic leading-[1.5] text-white/90">
+        « Chaque élève, chaque note, chaque frais — un seul registre. »
+      </p>
+    </div>
+  </aside>
+
+  <main class="auth-stage flex flex-1 items-center justify-center px-6 py-14">
+    <div class="w-full max-w-[420px]">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

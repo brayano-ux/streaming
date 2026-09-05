@@ -1,0 +1,58 @@
+<div class="page-header">
+  <h1>Affecter une matière à une classe</h1>
+</div>
+
+@if (loading()) {
+<p>Chargement...</p>
+} @else {
+<form class="form-card" [formGroup]="form" (ngSubmit)="onSubmit()" novalidate>
+  <div class="field-group">
+    <label for="classeId">Classe</label>
+    <select id="classeId" formControlName="classeId" (change)="onClasseChange()">
+      <option [value]="0" disabled>Choisir une classe</option>
+      @for (classe of classes(); track classe.id) {
+      <option [value]="classe.id">{{ classe.nom }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-row">
+    <div class="field-group">
+      <label for="matiereId">Matière</label>
+      <select id="matiereId" formControlName="matiereId">
+        <option [value]="0" disabled>Choisir une matière</option>
+        @for (matiere of matieres(); track matiere.id) {
+        <option [value]="matiere.id">{{ matiere.nom }}</option>
+        }
+      </select>
+    </div>
+    <div class="field-group">
+      <label for="coefficient">Coefficient</label>
+      <input id="coefficient" type="number" min="1" formControlName="coefficient" />
+    </div>
+  </div>
+
+  @if (errorMessage) {
+  <div class="alert-error">{{ errorMessage }}</div>
+  }
+
+  <button type="submit" class="btn-submit" [disabled]="form.invalid">Affecter</button>
+</form>
+
+@if (affectations().length > 0) {
+<table class="data-table">
+  <thead>
+  <tr><th>Matière</th><th>Coefficient</th><th></th></tr>
+  </thead>
+  <tbody>
+  @for (a of affectations(); track a.id) {
+  <tr>
+    <td>{{ a.matiereNom }}</td>
+    <td>{{ a.coefficient }}</td>
+    <td><button (click)="supprimer(a.id)" class="btn-danger">Retirer</button></td>
+  </tr>
+  }
+  </tbody>
+</table>
+}
+}

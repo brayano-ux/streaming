@@ -1,0 +1,165 @@
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 bg-slate-50/50 min-h-screen">
+
+  <!-- Fil d'Ariane & En-tête -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <a (click)="annuler()"
+         class="inline-flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors cursor-pointer mb-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Retour
+      </a>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900">Nouvelle inscription</h1>
+      <p class="text-sm text-slate-500">Inscrivez un élève dans une classe pour l'année scolaire en cours.</p>
+    </div>
+  </div>
+
+  <!-- État de Chargement Skeleton -->
+  @if (loading()) {
+  <div class="bg-white rounded-2xl border border-slate-200/80 p-8 shadow-sm space-y-6 animate-pulse">
+    <div class="h-6 bg-slate-200 rounded w-1/3"></div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div class="h-10 bg-slate-100 rounded-xl"></div>
+      <div class="h-10 bg-slate-100 rounded-xl"></div>
+      <div class="h-10 bg-slate-100 rounded-xl"></div>
+      <div class="h-10 bg-slate-100 rounded-xl"></div>
+    </div>
+    <div class="h-12 bg-slate-100 rounded-xl w-full"></div>
+  </div>
+  }
+
+  <!-- Formulaire Principal -->
+  @else {
+  <form [formGroup]="inscriptionForm" (ngSubmit)="onSubmit()" novalidate class="space-y-6">
+
+    <!-- Carte Principale -->
+    <div class="bg-white rounded-2xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6">
+
+      <!-- En-tête de Section -->
+      <div class="flex items-center gap-3 pb-4 border-b border-slate-100">
+        <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+          </svg>
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-slate-900">Dossier d'Inscription</h2>
+          <p class="text-xs text-slate-500">Sélectionnez l'élève et la classe de destination</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+        <!-- Sélection Élève -->
+        <div class="space-y-2">
+          <label for="eleveId" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            Élève <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            <select id="eleveId"
+                    formControlName="eleveId"
+                    class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white rounded-xl border border-slate-200 shadow-sm appearance-none transition-all duration-150 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 pr-10">
+              <option [value]="0" disabled>Choisir un élève</option>
+              @for (eleve of eleves(); track eleve.id) {
+              <option [value]="eleve.id">{{ eleve.prenom }} {{ eleve.nom }}</option>
+              }
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label>
+            <input type="checkbox" formControlName="redoublant" />
+            Redoublant(e)
+          </label>
+        </div>
+        <!-- Sélection Classe -->
+        <div class="space-y-2">
+          <label for="classeId" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            Classe <span class="text-rose-500">*</span>
+          </label>
+          <div class="relative">
+            <select id="classeId"
+                    formControlName="classeId"
+                    class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white rounded-xl border border-slate-200 shadow-sm appearance-none transition-all duration-150 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 pr-10">
+              <option [value]="0" disabled>Choisir une classe</option>
+              @for (classe of classes(); track classe.id) {
+              <option [value]="classe.id">{{ classe.nom }}</option>
+              }
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Année Scolaire -->
+        <div class="space-y-2">
+          <label for="anneeScolaire" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            Année scolaire <span class="text-rose-500">*</span>
+          </label>
+          <input id="anneeScolaire"
+                 type="text"
+                 formControlName="anneeScolaire"
+                 placeholder="Ex: 2025-2026"
+                 class="w-full px-3.5 py-2.5 text-sm font-medium text-slate-900 bg-white rounded-xl border border-slate-200 shadow-sm transition-all duration-150 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 placeholder:text-slate-400" />
+        </div>
+
+        <!-- Date d'Inscription -->
+        <div class="space-y-2">
+          <label for="dateInscription" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider">
+            Date d'inscription <span class="text-rose-500">*</span>
+          </label>
+          <input id="dateInscription"
+                 type="date"
+                 formControlName="dateInscription"
+                 class="w-full px-3.5 py-2.5 text-sm text-slate-900 bg-white rounded-xl border border-slate-200 shadow-sm transition-all duration-150 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Message d'Erreur -->
+    @if (errorMessage) {
+    <div class="p-4 rounded-xl bg-rose-50 border border-rose-200/80 flex items-center gap-3 text-rose-800" role="alert">
+      <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+      <span class="text-sm font-medium">{{ errorMessage }}</span>
+    </div>
+    }
+
+    <!-- Boutons d'Action -->
+    <div class="flex items-center justify-end gap-3 pt-2">
+      <button type="button"
+              (click)="annuler()"
+              class="px-5 py-2.5 text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl shadow-sm transition-all duration-150 cursor-pointer">
+        Annuler
+      </button>
+
+      <button type="submit"
+              [disabled]="inscriptionForm.invalid || saving"
+              class="inline-flex items-center justify-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 disabled:bg-slate-300 disabled:cursor-not-allowed rounded-xl shadow-sm shadow-indigo-200 transition-all duration-150 cursor-pointer">
+        @if (saving) {
+        <svg class="w-4 h-4 text-white animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Enregistrement...
+        } @else {
+        Inscrire l'élève
+        }
+      </button>
+    </div>
+
+  </form>
+  }
+</div>

@@ -1,0 +1,131 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 bg-slate-50/50 min-h-screen">
+
+  <!-- En-tête de page & Action principale -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-slate-200/80">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900">Inscriptions</h1>
+      <p class="text-sm text-slate-500">Gérez le registre des inscriptions des élèves par classe et année scolaire.</p>
+    </div>
+    <div>
+      <a routerLink="/dashboard/inscriptions/nouvelle"
+         class="inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 rounded-xl shadow-sm shadow-indigo-200 transition-all duration-150 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nouvelle inscription
+      </a>
+    </div>
+  </div>
+
+  <!-- État de Chargement (Skeleton Loader) -->
+  @if (loading()) {
+  <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden p-6 space-y-4 animate-pulse">
+    <div class="h-6 bg-slate-200 rounded w-1/4"></div>
+    <div class="space-y-3 pt-2">
+      <div class="h-10 bg-slate-100 rounded-xl w-full"></div>
+      <div class="h-10 bg-slate-100 rounded-xl w-full"></div>
+      <div class="h-10 bg-slate-100 rounded-xl w-full"></div>
+      <div class="h-10 bg-slate-100 rounded-xl w-full"></div>
+    </div>
+  </div>
+  }
+
+  <!-- État d'Erreur -->
+  @else if (errorMessage()) {
+  <div class="p-4 rounded-xl bg-rose-50 border border-rose-200/80 flex items-center gap-3 text-rose-800" role="alert">
+    <svg class="w-5 h-5 text-rose-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+    </svg>
+    <span class="text-sm font-medium">{{ errorMessage() }}</span>
+  </div>
+  }
+
+  <!-- État Vide (Aucune Donnée) -->
+  @else if (inscriptions().length === 0) {
+  <div class="bg-white rounded-2xl border border-slate-200/80 p-12 text-center shadow-sm max-w-lg mx-auto my-8 space-y-4">
+    <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 mx-auto flex items-center justify-center">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+      </svg>
+    </div>
+    <div>
+      <h3 class="text-base font-bold text-slate-900">Aucune inscription enregistrée</h3>
+      <p class="text-sm text-slate-500 mt-1">Commencez par inscrire un élève dans une classe pour lancer le registre.</p>
+    </div>
+    <a routerLink="/dashboard/inscriptions/nouvelle"
+       class="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors cursor-pointer">
+      + Nouvelle inscription
+    </a>
+  </div>
+  }
+
+  <!-- Tableau des Inscriptions -->
+  @else {
+  <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+        <tr class="bg-slate-50/80 border-b border-slate-200/80 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          <th scope="col" class="px-6 py-3.5">Élève</th>
+          <th scope="col" class="px-6 py-3.5">Classe</th>
+          <th scope="col" class="px-6 py-3.5">Année scolaire</th>
+          <th scope="col" class="px-6 py-3.5">Date d'inscription</th>
+          <th scope="col" class="px-6 py-3.5 text-right">Actions</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-sm">
+        @for (inscription of inscriptions(); track inscription.id) {
+        <tr class="hover:bg-slate-50/50 transition-colors group">
+
+          <!-- Élève -->
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-slate-100 border border-slate-200/60 text-slate-600 flex items-center justify-center font-bold text-xs shrink-0">
+                {{ inscription.eleveNomComplet?.charAt(0) || 'E' }}
+              </div>
+              <span class="font-semibold text-slate-900">{{ inscription.eleveNomComplet }}</span>
+            </div>
+          </td>
+
+          <!-- Classe -->
+          <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                    {{ inscription.classeNom }}
+                  </span>
+          </td>
+
+          <!-- Année Scolaire -->
+          <td class="px-6 py-4 whitespace-nowrap text-slate-600 font-mono text-xs font-medium">
+            {{ inscription.anneeScolaire }}
+          </td>
+
+          <!-- Date d'inscription -->
+          <td class="px-6 py-4 whitespace-nowrap text-slate-500">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              <span>{{ inscription.dateInscription }}</span>
+            </div>
+          </td>
+
+          <!-- Actions -->
+          <td class="px-6 py-4 whitespace-nowrap text-right">
+            <button (click)="supprimer(inscription.id)"
+                    title="Supprimer l'inscription"
+                    class="inline-flex items-center justify-center p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all duration-150 cursor-pointer">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+          </td>
+
+        </tr>
+        }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  }
+</div>

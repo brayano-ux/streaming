@@ -1,0 +1,242 @@
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+  <!-- En-tête de la page -->
+  <div class="pb-6 border-b border-slate-200">
+    <h1 class="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Bulletins</h1>
+    <p class="mt-1 text-sm text-slate-500">Aperçu, compléments et génération de bulletins personnalisés.</p>
+  </div>
+
+  <!-- Formulaire de recherche -->
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
+    <h2 class="text-lg font-semibold text-slate-900 mb-6">Sélection des critères</h2>
+    <form [formGroup]="rechercheForm" (ngSubmit)="genererApercu()" novalidate>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Élève -->
+        <div>
+          <label for="eleveId" class="block text-sm font-medium text-slate-700 mb-1.5">Élève <span class="text-red-500">*</span></label>
+          <select id="eleveId" formControlName="eleveId"
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20fill%3D%22%2394a3b8%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M10%2013l4-4H6l4%204z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px_20px] bg-[right_12px_center] bg-no-repeat pr-10">
+            <option [value]="0" disabled>Choisir un élève</option>
+            @for (eleve of eleves(); track eleve.id) {
+            <option [value]="eleve.id">{{ eleve.prenom }} {{ eleve.nom }}</option>
+            }
+          </select>
+        </div>
+        <!-- Trimestre -->
+        <div>
+          <label for="trimestre" class="block text-sm font-medium text-slate-700 mb-1.5">Trimestre <span class="text-red-500">*</span></label>
+          <select id="trimestre" formControlName="trimestre"
+                  class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-colors appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20fill%3D%22%2394a3b8%22%20viewBox%3D%220%200%2020%2020%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M10%2013l4-4H6l4%204z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px_20px] bg-[right_12px_center] bg-no-repeat pr-10">
+            <option value="Trimestre 1">Trimestre 1</option>
+            <option value="Trimestre 2">Trimestre 2</option>
+            <option value="Trimestre 3">Trimestre 3</option>
+          </select>
+        </div>
+        <!-- Année scolaire -->
+        <div>
+          <label for="anneeScolaire" class="block text-sm font-medium text-slate-700 mb-1.5">Année scolaire <span class="text-red-500">*</span></label>
+          <input id="anneeScolaire" type="text" formControlName="anneeScolaire"
+                 placeholder="ex: 2026-2027"
+                 class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-colors">
+        </div>
+      </div>
+      <div class="mt-6 flex justify-end">
+        <button type="submit" [disabled]="rechercheForm.invalid || loading"
+                class="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed rounded-xl shadow-sm shadow-indigo-200 transition-all">
+          @if (loading) {
+          <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Génération...
+          } @else {
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+          </svg>
+          Aperçu du bulletin
+          }
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Message d'erreur -->
+  @if (errorMessage) {
+  <div class="p-4 rounded-xl bg-red-50 border border-red-200 flex items-start gap-3">
+    <svg class="w-5 h-5 text-red-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <div>
+      <h3 class="text-sm font-semibold text-red-800">Erreur</h3>
+      <p class="mt-1 text-sm text-red-700">{{ errorMessage }}</p>
+    </div>
+  </div>
+  }
+
+  <!-- Bulletin généré -->
+  @if (bulletin(); as b) {
+  <div class="space-y-6">
+    <!-- Carte d'identité du bulletin -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+      <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-5 sm:px-8">
+        <h2 class="text-xl font-bold text-white">{{ b.eleveNomComplet }}</h2>
+        <p class="mt-1 text-indigo-100 text-sm flex flex-wrap gap-x-4 gap-y-1">
+            <span class="inline-flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21v-2a6 6 0 016 0v2m-6-10h.01M10 11a3 3 0 013-3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              Matricule : {{ b.matricule }}
+            </span>
+          <span class="inline-flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+              </svg>
+              {{ b.classeNom }}
+            </span>
+          <span class="inline-flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+              {{ b.trimestre }}
+            </span>
+          <span class="inline-flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              {{ b.anneeScolaire }}
+            </span>
+        </p>
+      </div>
+
+      <!-- Tableau des matières -->
+      <div class="p-6 sm:p-8">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-600">
+            <thead class="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-wider font-semibold text-slate-500">
+            <tr>
+              <th scope="col" class="px-6 py-4">Matière</th>
+              <th scope="col" class="px-6 py-4">Note</th>
+              <th scope="col" class="px-6 py-4">Coef.</th>
+              <th scope="col" class="px-6 py-4">Total</th>
+              <th scope="col" class="px-6 py-4">Moy. classe</th>
+              <th scope="col" class="px-6 py-4">Appréciation</th>
+              <th scope="col" class="px-6 py-4">Enseignant</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+            @for (m of b.matieres; track m.matiere) {
+            <tr class="hover:bg-slate-50/80 transition-colors">
+              <td class="px-6 py-4 font-medium text-slate-900">{{ m.matiere }}</td>
+              <td class="px-6 py-4">
+                <!-- ⚠️ Correction ici : [class.XXX] remplacé par [ngClass] -->
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold"
+                      [ngClass]="{
+                        'bg-emerald-50 text-emerald-700': m.note >= 14,
+                        'bg-amber-50 text-amber-700': m.note >= 10 && m.note < 14,
+                        'bg-red-50 text-red-700': m.note < 10
+                      }">
+                  {{ m.note }}/20
+                </span>
+              </td>
+              <td class="px-6 py-4">{{ m.coefficient }}</td>
+              <td class="px-6 py-4 font-medium">{{ m.total }}</td>
+              <td class="px-6 py-4">{{ m.moyenneClasseMatiere }}</td>
+              <td class="px-6 py-4 text-xs max-w-[200px] truncate" [title]="m.appreciation">{{ m.appreciation }}</td>
+              <td class="px-6 py-4 text-slate-500">{{ m.enseignant }}</td>
+            </tr>
+            }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Synthèse statistique -->
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="p-4 bg-indigo-50 rounded-2xl border border-indigo-100">
+            <p class="text-sm text-indigo-600 font-medium">Moyenne générale</p>
+            <p class="mt-1 text-2xl font-bold text-indigo-900">{{ b.moyenneGenerale }}/20</p>
+          </div>
+          <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+            <p class="text-sm text-emerald-600 font-medium">Rang</p>
+            <p class="mt-1 text-2xl font-bold text-emerald-900">
+              {{ b.rang }}<sup class="text-sm">e</sup>
+              <span class="text-sm font-normal text-emerald-700 ml-1">/ {{ b.effectifClasse }}</span>
+            </p>
+          </div>
+          <div class="p-4 bg-amber-50 rounded-2xl border border-amber-100">
+            <p class="text-sm text-amber-600 font-medium">Moy. plus forte</p>
+            <p class="mt-1 text-2xl font-bold text-amber-900">{{ b.moyennePlusForte }}/20</p>
+          </div>
+          <div class="p-4 bg-rose-50 rounded-2xl border border-rose-100">
+            <p class="text-sm text-rose-600 font-medium">Moy. plus faible</p>
+            <p class="mt-1 text-2xl font-bold text-rose-900">{{ b.moyennePlusFaible }}/20</p>
+          </div>
+          <div class="p-4 bg-sky-50 rounded-2xl border border-sky-100 sm:col-span-2 lg:col-span-4">
+            <p class="text-sm text-sky-600 font-medium">Moyenne de la classe</p>
+            <p class="mt-1 text-2xl font-bold text-sky-900">{{ b.moyenneClasse }}/20</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulaire complémentaire -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8">
+      <h3 class="text-lg font-semibold text-slate-900 mb-6">Compléments avant génération du PDF</h3>
+      <form [formGroup]="complementForm" class="space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Absences justifiées (h)</label>
+            <input type="number" min="0" formControlName="absencesJustifiees"
+                   class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-colors">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Absences non justifiées (h)</label>
+            <input type="number" min="0" formControlName="absencesNonJustifiees"
+                   class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-colors">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1.5">Retards</label>
+            <input type="number" min="0" formControlName="retards"
+                   class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-colors">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Discipline</label>
+          <input type="text" formControlName="discipline"
+                 class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-colors">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Appréciation générale du Conseil de Classe</label>
+          <textarea formControlName="appreciationGenerale" rows="3"
+                    class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-colors"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-1.5">Décision du Conseil de Classe</label>
+          <input type="text" formControlName="decision"
+                 class="w-full px-4 py-2.5 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm transition-colors">
+        </div>
+      </form>
+
+      <div class="mt-6 flex justify-end">
+        <button (click)="telechargerPdf()" [disabled]="generatingPdf"
+                class="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed rounded-xl shadow-sm shadow-indigo-200 transition-all">
+          @if (generatingPdf) {
+          <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Génération du PDF...
+          } @else {
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          Télécharger le bulletin en PDF
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</div>

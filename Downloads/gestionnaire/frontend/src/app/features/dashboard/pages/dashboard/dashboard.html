@@ -1,0 +1,208 @@
+<div class="min-h-screen bg-gray-50/60 p-4 md:p-8 text-gray-800 font-sans">
+
+  <!-- EN-TÊTE -->
+  <header class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
+    <div>
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">Bonsoir, {{ userName() }}</h1>
+      <p class="text-sm text-gray-500 mt-1.5 flex items-center gap-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+        {{ currentDate() }} • Tableau de bord administrateur
+      </p>
+    </div>
+
+    <div class="flex items-center gap-3 mt-5 md:mt-0">
+      <div class="relative">
+        <select
+          [value]="roleSelected()"
+          (change)="roleSelected.set($any($event.target).value)"
+          class="appearance-none bg-white border border-gray-200 rounded-xl pl-4 pr-10 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 cursor-pointer transition-colors">
+          <option value="Administrateur">Administrateur</option>
+          <option value="Enseignant">Enseignant</option>
+          <option value="Parent">Parent</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </div>
+      </div>
+
+      <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+        {{ userName()?.charAt(0) }}
+      </div>
+    </div>
+  </header>
+
+
+  <!-- ÉTAT DE CHARGEMENT / ERREUR -->
+  @if (loading()) {
+  <div class="flex flex-col justify-center items-center py-20 text-gray-400 gap-3">
+    <div class="w-8 h-8 border-2 border-gray-200 border-t-indigo-600 rounded-full animate-spin"></div>
+    <span class="text-sm">Chargement des données en temps réel...</span>
+  </div>
+  } @else if (errorMessage()) {
+  <div class="bg-rose-50 border border-rose-200 text-rose-700 p-4 rounded-xl mb-6 flex items-center gap-3">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+    <span class="text-sm">{{ errorMessage() }}</span>
+  </div>
+  } @else {
+
+  <!-- BLOC DES CARTES KPI -->
+  @if (kpis()) {
+  <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-6">
+
+    <!-- KPI 1 : Total Étudiants -->
+    <div class="group bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-sm font-medium text-gray-500">Total Étudiants</span>
+          <div class="p-2.5 bg-indigo-50 rounded-xl text-indigo-600 group-hover:bg-indigo-100 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+          </div>
+        </div>
+        <h3 class="text-3xl font-bold text-gray-900 tracking-tight">{{ kpis()?.totalStudents | number }}</h3>
+        <p class="text-xs text-gray-400 mt-1">Étudiants inscrits cette année</p>
+      </div>
+      <div class="flex items-center gap-1 text-xs font-semibold text-emerald-600 mt-4 pt-3 border-t border-gray-50">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+        <span>{{ kpis()?.totalStudentsEvolution }}</span>
+      </div>
+    </div>
+
+    <!-- KPI 2 : Taux de Présence -->
+    <div class="group bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-sm font-medium text-gray-500">Taux de Présence</span>
+          <div class="p-2.5 bg-emerald-50 rounded-xl text-emerald-600 group-hover:bg-emerald-100 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+        </div>
+        <h3 class="text-3xl font-bold text-gray-900 tracking-tight">{{ kpis()?.presenceRate }}<span class="text-lg text-gray-400 font-medium">%</span></h3>
+        <p class="text-xs text-gray-400 mt-1">Présence moyenne</p>
+      </div>
+      <div class="flex items-center gap-1 text-xs font-semibold text-rose-600 mt-4 pt-3 border-t border-gray-50">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+        <span>{{ kpis()?.presenceRateEvolution }}</span>
+      </div>
+    </div>
+
+    <!-- KPI 3 : Moyenne Générale -->
+    <div class="group bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-sm font-medium text-gray-500">Moyenne Générale</span>
+          <div class="p-2.5 bg-amber-50 rounded-xl text-amber-600 group-hover:bg-amber-100 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </div>
+        </div>
+        <h3 class="text-3xl font-bold text-gray-900 tracking-tight">{{ kpis()?.generalAverage }}<span class="text-lg text-gray-400 font-medium">/20</span></h3>
+        <p class="text-xs text-gray-400 mt-1">Moyenne de tous les niveaux</p>
+      </div>
+      <div class="flex items-center gap-1 text-xs font-semibold text-emerald-600 mt-4 pt-3 border-t border-gray-50">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+        <span>{{ kpis()?.generalAverageEvolution }}</span>
+      </div>
+    </div>
+
+    <!-- KPI 4 : Alertes Actives -->
+    <div class="group bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-sm font-medium text-gray-500">Alertes Actives</span>
+          <div class="p-2.5 bg-rose-50 rounded-xl text-rose-600 group-hover:bg-rose-100 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          </div>
+        </div>
+        <h3 class="text-3xl font-bold text-gray-900 tracking-tight">{{ kpis()?.activeAlerts }}</h3>
+        <p class="text-xs text-gray-400 mt-1">Alertes nécessitant attention</p>
+      </div>
+      <div class="flex items-center gap-1 text-xs font-semibold text-indigo-600 mt-4 pt-3 border-t border-gray-50">
+        <span>{{ kpis()?.activeAlertsEvolution }}</span>
+      </div>
+    </div>
+  </section>
+  }
+
+  <!-- SECTION FINANCIÈRE -->
+  @if (finance(); as f) {
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm md:col-span-2">
+      <h2 class="text-base font-bold text-gray-900 mb-5">Trésorerie du mois</h2>
+      <div class="grid grid-cols-3 gap-4 divide-x divide-gray-100">
+        <div>
+          <p class="text-xs text-gray-500 mb-1">Encaissé</p>
+          <p class="text-xl font-bold text-emerald-600">{{ f.totalEncaisseMois | number }}<span class="text-xs font-medium text-gray-400 ml-1">FCFA</span></p>
+        </div>
+        <div class="pl-4">
+          <p class="text-xs text-gray-500 mb-1">Dépensé</p>
+          <p class="text-xl font-bold text-rose-600">{{ f.totalDepensesMois | number }}<span class="text-xs font-medium text-gray-400 ml-1">FCFA</span></p>
+        </div>
+        <div class="pl-4">
+          <p class="text-xs text-gray-500 mb-1">Solde</p>
+          <p class="text-xl font-bold" [class.text-emerald-600]="f.solde >= 0" [class.text-rose-600]="f.solde < 0">
+            {{ f.solde | number }}<span class="text-xs font-medium text-gray-400 ml-1">FCFA</span>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-gradient-to-br from-indigo-600 to-indigo-800 p-6 rounded-2xl shadow-sm text-white">
+      <h2 class="text-base font-bold mb-4">Recouvrement</h2>
+      <div class="flex items-end justify-between mb-3">
+        <span class="text-3xl font-bold">{{ f.tauxRecouvrement }}%</span>
+        <span class="text-xs text-indigo-200">des élèves à jour</span>
+      </div>
+      <div class="w-full bg-white/20 rounded-full h-2 mb-4">
+        <div class="bg-white h-2 rounded-full transition-all" [style.width.%]="f.tauxRecouvrement"></div>
+      </div>
+      <div class="flex justify-between text-xs text-indigo-100">
+        <span>{{ f.elevesAJour }} à jour</span>
+        <span>{{ f.elevesEnRetard }} en retard</span>
+      </div>
+    </div>
+
+  </section>
+  }
+
+  <!-- SECTION DES GRAPHES -->
+  <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm lg:col-span-5 flex flex-col justify-between">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-bold text-gray-900">Répartition par Classe</h2>
+        <span class="text-xs font-medium text-gray-500 bg-gray-50 border border-gray-100 px-2.5 py-1 rounded-lg">
+          Total: {{ totalDistributionStudents() }}
+        </span>
+      </div>
+      <div class="relative min-h-[240px] h-60 w-full">
+        <canvas #donutCanvas></canvas>
+      </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm lg:col-span-7 flex flex-col justify-between">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-bold text-gray-900">Évolution des Moyennes</h2>
+        <div class="inline-flex rounded-lg bg-gray-100 p-1 text-xs font-medium">
+          <button
+            (click)="setPeriod('semestre')"
+            [class.bg-white]="activePeriod() === 'semestre'"
+            [class.shadow-sm]="activePeriod() === 'semestre'"
+            [class.text-gray-900]="activePeriod() === 'semestre'"
+            [class.text-gray-500]="activePeriod() !== 'semestre'"
+            class="rounded-md px-3 py-1.5 focus:outline-none transition-all">Semestre</button>
+          <button
+            (click)="setPeriod('annee')"
+            [class.bg-white]="activePeriod() === 'annee'"
+            [class.shadow-sm]="activePeriod() === 'annee'"
+            [class.text-gray-900]="activePeriod() === 'annee'"
+            [class.text-gray-500]="activePeriod() !== 'annee'"
+            class="rounded-md px-3 py-1.5 focus:outline-none transition-all">Année</button>
+        </div>
+      </div>
+      <div class="relative min-h-[240px] h-60 w-full">
+        <canvas #lineCanvas></canvas>
+      </div>
+    </div>
+  </section>
+  }
+</div>

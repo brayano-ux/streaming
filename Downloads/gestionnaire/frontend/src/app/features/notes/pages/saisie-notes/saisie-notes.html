@@ -1,0 +1,138 @@
+<div class="max-w-4xl mx-auto space-y-6">
+  <!-- En-tête de la page -->
+  <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Saisie des Notes</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Renseignez les informations pour attribuer une nouvelle note à un élève.</p>
+    </div>
+  </div>
+
+  @if (loading()) {
+  <!-- Spinner de chargement -->
+  <div class="flex flex-col items-center justify-center py-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+    <div class="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Chargement des formulaires...</p>
+  </div>
+  } @else {
+  <form [formGroup]="noteForm" (ngSubmit)="onSubmit()" novalidate
+        class="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 space-y-6">
+
+    <!-- Ligne 1 : Classe et Séquence -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div class="space-y-2">
+        <label for="classeId" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Classe</label>
+        <select id="classeId" formControlName="classeId" (change)="onClasseChange()"
+                class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+          <option [value]="0" disabled>Choisir une classe</option>
+          @for (classe of classes(); track classe.id) {
+          <option [value]="classe.id">{{ classe.nom }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="space-y-2">
+        <label for="sequence" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Séquence</label>
+        <select id="sequence" formControlName="sequence"
+                class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+          @for (seq of sequences; track seq) {
+          <option [value]="seq">{{ seq }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <!-- Section Sélection Élève (Affiché dynamiquement) -->
+    @if (elevesDeLaClasse().length > 0) {
+    <div class="p-4 bg-slate-50/50 dark:bg-slate-800/30 border border-slate-200/60 dark:border-slate-800 rounded-2xl space-y-4">
+      <div class="space-y-2">
+        <label for="rechercheEleve" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Rechercher un élève</label>
+        <div class="relative">
+          <input id="rechercheEleve" type="text" placeholder="Tapez un nom ou prénom..."
+                 [value]="rechercheEleve()"
+                 (input)="rechercheEleve.set($any($event.target).value)"
+                 class="w-full pl-9 pr-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+          <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label for="eleveId" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Sélectionner l'élève</label>
+        <select id="eleveId" formControlName="eleveId"
+                class="w-full px-3.5 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+          <option [value]="0" disabled>Choisir un élève</option>
+          @for (eleve of elevesFiltres(); track eleve.id) {
+          <option [value]="eleve.id">{{ eleve.prenom }} {{ eleve.nom }}</option>
+          }
+        </select>
+        @if (elevesFiltres().length === 0) {
+        <p class="text-xs text-amber-600 dark:text-amber-400 mt-1 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          Aucun élève ne correspond à cette recherche.
+        </p>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- Ligne Matière -->
+    <div class="space-y-2">
+      <label for="matiereId" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Matière</label>
+      <select id="matiereId" formControlName="matiereId"
+              class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+        <option [value]="0" disabled>Choisir une matière</option>
+        @for (matiere of matieres(); track matiere.id) {
+        <option [value]="matiere.id">{{ matiere.nom }} (coef. {{ matiere.coefficient }})</option>
+        }
+      </select>
+    </div>
+
+    <!-- Ligne 2 : Note et Année Scolaire -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div class="space-y-2">
+        <label for="valeur" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Note (/20)</label>
+        <div class="relative">
+          <input id="valeur" type="number" min="0" max="20" step="0.5" formControlName="valeur" placeholder="Ex: 15.5"
+                 class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+          <span class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">/20</span>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <label for="anneeScolaire" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Année scolaire</label>
+        <input id="anneeScolaire" type="text" formControlName="anneeScolaire" placeholder="Ex: 2025-2026"
+               class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+      </div>
+    </div>
+
+    <!-- Alerte d'erreur -->
+    @if (errorMessage) {
+    <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-xl text-red-700 dark:text-red-400 text-sm" role="alert">
+      <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+      <span>{{ errorMessage }}</span>
+    </div>
+    }
+
+    <!-- Actions du formulaire -->
+    <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
+      <button type="button" (click)="terminer()"
+              class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium text-sm rounded-xl transition-all duration-200">
+        Terminer
+      </button>
+      <button type="submit" [disabled]="noteForm.invalid || saving"
+              class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-300 dark:disabled:bg-slate-800 text-white font-medium text-sm rounded-xl shadow-sm shadow-indigo-200 dark:shadow-none transition-all duration-200 hover:shadow-md active:scale-95 disabled:cursor-not-allowed">
+        @if (saving) {
+        <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+        <span>Enregistrement...</span>
+        } @else {
+        <span>Enregistrer et continuer</span>
+        }
+      </button>
+    </div>
+
+  </form>
+  }
+</div>

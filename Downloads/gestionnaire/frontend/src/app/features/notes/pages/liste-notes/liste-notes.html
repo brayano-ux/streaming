@@ -1,0 +1,123 @@
+<div class="space-y-6">
+  <!-- En-tête de la page -->
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800">
+    <div>
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Gestion des Notes</h1>
+      <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Consultez, filtrez et gérez l'ensemble des évaluations des élèves.</p>
+    </div>
+    <a routerLink="/dashboard/notes/saisie"
+       class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm rounded-xl shadow-sm shadow-indigo-200 dark:shadow-none transition-all duration-200 hover:shadow-md active:scale-95">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+      Saisir une note
+    </a>
+  </div>
+
+  <!-- Barre de filtres -->
+  <form [formGroup]="filtreForm" (ngSubmit)="chargerNotes()"
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-white dark:bg-slate-900 p-4 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800">
+    <div>
+      <select formControlName="classeId"
+              class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+        <option [value]="0">Toutes les classes</option>
+        @for (classe of classes(); track classe.id) {
+        <option [value]="classe.id">{{ classe.nom }}</option>
+        }
+      </select>
+    </div>
+
+    <div>
+      <select formControlName="sequence"
+              class="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-700 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+        <option value="">Toutes les séquences</option>
+        @for (seq of sequences; track seq) {
+        <option [value]="seq">{{ seq }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="relative">
+      <input type="text" formControlName="nom" placeholder="Rechercher un nom..."
+             class="w-full pl-9 pr-3.5 py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+      <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    </div>
+
+    <button type="submit"
+            class="w-full px-4 py-2.5 bg-slate-900 hover:bg-slate-800 dark:bg-slate-800 dark:hover:bg-slate-700 text-white font-medium text-sm rounded-xl transition-all duration-200 flex items-center justify-center gap-2">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+      Filtrer
+    </button>
+  </form>
+
+  <!-- États de chargement, d'erreur et vide -->
+  @if (loading()) {
+  <div class="flex flex-col items-center justify-center py-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800">
+    <div class="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mb-3"></div>
+    <p class="text-sm font-medium text-slate-500 dark:text-slate-400">Chargement des données...</p>
+  </div>
+  } @else if (errorMessage()) {
+  <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-2xl text-red-700 dark:text-red-400 text-sm">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+    <span>{{ errorMessage() }}</span>
+  </div>
+  } @else if (notes().length === 0) {
+  <div class="flex flex-col items-center justify-center py-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-center px-4">
+    <div class="p-3 bg-slate-100 dark:bg-slate-800 rounded-full mb-3 text-slate-400">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+    </div>
+    <h3 class="text-base font-semibold text-slate-900 dark:text-white">Aucune note trouvée</h3>
+    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Aucune note ne correspond aux filtres sélectionnés.</p>
+  </div>
+  } @else {
+  <!-- Tableau de données -->
+  <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/80 dark:border-slate-800 overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead>
+        <tr class="bg-slate-50/80 dark:bg-slate-800/50 border-b border-slate-200/80 dark:border-slate-800 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          <th scope="col" class="py-3.5 px-5">Élève</th>
+          <th scope="col" class="py-3.5 px-4">Classe</th>
+          <th scope="col" class="py-3.5 px-4">Matière</th>
+          <th scope="col" class="py-3.5 px-4">Note</th>
+          <th scope="col" class="py-3.5 px-4">Séquence</th>
+          <th scope="col" class="py-3.5 px-5 text-right">Actions</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+        @for (note of notes(); track note.id) {
+        <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+          <td class="py-3.5 px-5 font-medium">
+            <a [routerLink]="['/dashboard/notes/eleve', note.eleveId]"
+               class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline">
+              {{ note.eleveNomComplet }}
+            </a>
+          </td>
+          <td class="py-3.5 px-4 text-slate-600 dark:text-slate-300">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                    {{ note.classeNom }}
+                  </span>
+          </td>
+          <td class="py-3.5 px-4 text-slate-700 dark:text-slate-200">
+            {{ note.matiereNom }}
+            <span class="text-xs text-slate-400 font-normal">(coef. {{ note.coefficient }})</span>
+          </td>
+          <td class="py-3.5 px-4 font-semibold text-slate-900 dark:text-white">
+            {{ note.valeur }}<span class="text-xs font-normal text-slate-400">/20</span>
+          </td>
+          <td class="py-3.5 px-4 text-slate-600 dark:text-slate-300">
+            {{ note.sequence }}
+          </td>
+          <td class="py-3.5 px-5 text-right">
+            <button (click)="supprimer(note.id)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              Supprimer
+            </button>
+          </td>
+        </tr>
+        }
+        </tbody>
+      </table>
+    </div>
+  </div>
+  }
+</div>

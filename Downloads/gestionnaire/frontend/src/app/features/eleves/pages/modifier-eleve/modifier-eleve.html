@@ -1,0 +1,67 @@
+<div class="page-header">
+  <h1>Modifier l'élève</h1>
+</div>
+
+@if (loading()) {
+<p>Chargement...</p>
+} @else {
+<form class="form-card" [formGroup]="eleveForm" (ngSubmit)="onSubmit()" novalidate>
+  <div class="form-row">
+    <div class="field-group">
+      <label for="nom">Nom</label>
+      <input id="nom" type="text" formControlName="nom" />
+    </div>
+    <div class="field-group">
+      <label for="prenom">Prénom</label>
+      <input id="prenom" type="text" formControlName="prenom" />
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="field-group">
+      <label for="matricule">Matricule</label>
+      <input id="matricule" type="text" formControlName="matricule" />
+    </div>
+    <div class="field-group">
+      <label for="dateNaissance">Date de naissance</label>
+      <input id="dateNaissance" type="date" formControlName="dateNaissance" />
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="field-group">
+      <label for="lieuNaissance">Lieu de naissance</label>
+      <input id="lieuNaissance" type="text" formControlName="lieuNaissance" />
+    </div>
+    <div class="field-group">
+      <label for="sexe">Sexe</label>
+      <select id="sexe" formControlName="sexe">
+        <option value="M">Masculin</option>
+        <option value="F">Féminin</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="field-group">
+      <label for="nomParent">Nom du parent</label>
+      <input id="nomParent" type="text" formControlName="nomParent" />
+    </div>
+    <div class="field-group">
+      <label for="telephoneParent">Téléphone du parent</label>
+      <input id="telephoneParent" type="tel" formControlName="telephoneParent" />
+    </div>
+  </div>
+
+  @if (errorMessage) {
+  <div class="alert-error" role="alert">{{ errorMessage }}</div>
+  }
+
+  <div class="form-actions">
+    <button type="button" class="btn-secondary" (click)="annuler()">Annuler</button>
+    <button type="submit" class="btn-submit" [disabled]="eleveForm.invalid || saving">
+      {{ saving ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+    </button>
+  </div>
+</form>
+}
