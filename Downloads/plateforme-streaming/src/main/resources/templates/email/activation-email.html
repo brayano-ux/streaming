@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body style="font-family: sans-serif; background: #0f1115; color: #eaeaf0; padding: 2rem;">
+    <div style="max-width: 480px; margin: 0 auto; background: #171a21; border-radius: 12px; padding: 2rem;">
+        <h1 style="color: #a29bfe;">Bienvenue <span th:text="${nom}"></span> !</h1>
+        <p>Voici votre code d'activation :</p>
+        <p style="font-size: 2rem; font-weight: bold; letter-spacing: 0.2em; color: #6c5ce7;" th:text="${code}"></p>
+        <p>Ce code est valable <span th:text="${dureeValiditeMinutes}"></span> minutes.</p>
+        <p style="color: #9a9db0; font-size: 0.85rem;">Si vous n'etes pas a l'origine de cette inscription, ignorez cet email.</p>
+    </div>
+</body>
+</html>

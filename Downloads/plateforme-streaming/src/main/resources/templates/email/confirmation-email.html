@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body style="font-family: sans-serif; background: #0f1115; color: #eaeaf0; padding: 2rem;">
+    <div style="max-width: 480px; margin: 0 auto; background: #171a21; border-radius: 12px; padding: 2rem;">
+        <h1 style="color: #a29bfe;">Fichier bien recu</h1>
+        <p>Bonjour <span th:text="${nom}"></span>,</p>
+        <p>Votre fichier <strong th:text="${nomFichier}"></strong> a bien ete enregistre sur votre espace.</p>
+        <p>Vous en trouverez une copie en piece jointe.</p>
+    </div>
+</body>
+</html>

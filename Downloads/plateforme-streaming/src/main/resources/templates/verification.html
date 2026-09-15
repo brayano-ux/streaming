@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Verification - StreamPerso</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="conteneur-auth">
+        <h1>Verifiez votre email</h1>
+        <p style="color: var(--texte-attenue); font-size: 0.9rem;">
+            Un code a ete envoye a <strong th:text="${verificationForm.email}"></strong>. Saisissez-le ci-dessous.
+        </p>
+
+        <p class="message-erreur" th:if="${erreur}" th:text="${erreur}"></p>
+        <p class="message-info" th:if="${info}" th:text="${info}"></p>
+
+        <form method="post" th:action="@{/verification}" th:object="${verificationForm}">
+            <input type="hidden" th:field="*{email}">
+            <div class="champ">
+                <label for="code">Code d'activation</label>
+                <input type="text" id="code" th:field="*{code}" maxlength="6" required autofocus>
+                <p class="message-erreur" th:if="${#fields.hasErrors('code')}" th:errors="*{code}"></p>
+            </div>
+            <button type="submit" class="bouton">Activer mon compte</button>
+        </form>
+
+        <form method="post" th:action="@{/verification/renvoi}" style="margin-top: 1rem;">
+            <input type="hidden" name="email" th:value="${verificationForm.email}">
+            <button type="submit" class="bouton" style="background: transparent; border: 1px solid var(--bordure); color: var(--texte-attenue);">
+                Renvoyer le code
+            </button>
+        </form>
+    </div>
+</body>
+</html>

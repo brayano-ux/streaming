@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ma bibliotheque - StreamPerso</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/nav :: nav}"></div>
+
+    <div class="page-dashboard">
+        <div class="entete-dashboard">
+            <h1>Bonjour <span th:text="${utilisateur.nom}"></span></h1>
+        </div>
+
+        <div class="zone-upload">
+            <form method="post" th:action="@{/fichiers/upload}" enctype="multipart/form-data" style="display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center; width: 100%;">
+                <select name="typeMedia" required>
+                    <option value="VIDEO">Video</option>
+                    <option value="PHOTO">Photo</option>
+                    <option value="MUSIQUE">Musique</option>
+                </select>
+                <input type="file" name="fichier" required>
+                <button type="submit">Deposer</button>
+            </form>
+        </div>
+        <p class="message-erreur" th:if="${erreurUpload}" th:text="${erreurUpload}"></p>
+
+        <div class="onglets">
+            <a th:href="@{/dashboard}" class="onglet" th:classappend="${ongletActif == 'TOUS'} ? 'actif' : ''">Tous</a>
+            <a th:href="@{/dashboard(type='VIDEO')}" class="onglet" th:classappend="${ongletActif == 'VIDEO'} ? 'actif' : ''">Videos</a>
+            <a th:href="@{/dashboard(type='PHOTO')}" class="onglet" th:classappend="${ongletActif == 'PHOTO'} ? 'actif' : ''">Photos</a>
+            <a th:href="@{/dashboard(type='MUSIQUE')}" class="onglet" th:classappend="${ongletActif == 'MUSIQUE'} ? 'actif' : ''">Musiques</a>
+        </div>
+
+        <div th:if="${#lists.isEmpty(fichiers)}" class="message-vide">
+            Aucun fichier pour le moment. Deposez votre premiere video, photo ou musique ci-dessus.
+        </div>
+
+        <div class="grille-fichiers" th:unless="${#lists.isEmpty(fichiers)}">
+            <a th:each="f : ${fichiers}" th:href="@{'/fichiers/' + ${f.id}}" class="carte-fichier" style="text-decoration: none; color: inherit;">
+                <span class="type-badge" th:text="${f.typeMedia}"></span>
+                <span class="nom-fichier" th:text="${f.nomOriginal}"></span>
+                <span class="date-fichier" th:text="${#temporals.format(f.dateUpload, 'dd/MM/yyyy HH:mm')}"></span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

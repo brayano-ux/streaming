@@ -1,0 +1,55 @@
+spring:
+  application:
+    name: plateforme-streaming-personnelle
+
+  # Profil par defaut = dev, base H2 en memoire (aucune configuration requise)
+  profiles:
+    active: dev
+
+  thymeleaf:
+    cache: false
+
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID:changez-moi}
+            client-secret: ${GOOGLE_CLIENT_SECRET:changez-moi}
+            scope:
+              - email
+              - profile
+
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:changez-moi@gmail.com}
+    password: ${MAIL_PASSWORD:changez-moi}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+application:
+  stockage:
+    dossier: ${STOCKAGE_DOSSIER:uploads}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+server:
+  port: ${PORT:8080}
+
+logging:
+  level:
+    com.plateforme.streaming: INFO

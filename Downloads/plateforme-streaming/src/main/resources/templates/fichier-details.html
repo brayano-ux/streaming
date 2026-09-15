@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${fichier.nomOriginal} + ' - StreamPerso'"></title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:replace="~{fragments/nav :: nav}"></div>
+
+    <div class="page-fichier">
+        <a th:href="@{/dashboard}" style="font-size: 0.9rem;">&larr; Retour a la bibliotheque</a>
+        <h1 th:text="${fichier.nomOriginal}"></h1>
+
+        <video th:if="${fichier.typeMedia.name() == 'VIDEO'}" class="lecteur" controls>
+            <source th:src="@{'/fichiers/' + ${fichier.id} + '/telecharger'}" th:type="${fichier.typeMime}">
+        </video>
+
+        <img th:if="${fichier.typeMedia.name() == 'PHOTO'}" class="image-fichier"
+             th:src="@{'/fichiers/' + ${fichier.id} + '/telecharger'}" th:alt="${fichier.nomOriginal}">
+
+        <audio th:if="${fichier.typeMedia.name() == 'MUSIQUE'}" class="lecteur" controls style="height: 54px;">
+            <source th:src="@{'/fichiers/' + ${fichier.id} + '/telecharger'}" th:type="${fichier.typeMime}">
+        </audio>
+
+        <div class="actions-fichier">
+            <form method="post" th:action="@{'/fichiers/' + ${fichier.id} + '/reactions'}">
+                <input type="hidden" name="type" value="AIME">
+                <button type="submit" class="bouton-reaction" th:classappend="${totaux.maReaction == 'AIME'} ? 'active' : ''">
+                    J'aime (<span th:text="${totaux.totalAime}"></span>)
+                </button>
+            </form>
+            <form method="post" th:action="@{'/fichiers/' + ${fichier.id} + '/reactions'}">
+                <input type="hidden" name="type" value="PAS_AIME">
+                <button type="submit" class="bouton-reaction" th:classappend="${totaux.maReaction == 'PAS_AIME'} ? 'active' : ''">
+                    Je n'aime pas (<span th:text="${totaux.totalPasAime}"></span>)
+                </button>
+            </form>
+            <a th:href="@{'/fichiers/' + ${fichier.id} + '/telecharger'}" class="bouton-telecharger" download>Telecharger</a>
+        </div>
+
+        <div class="section-commentaires">
+            <h2>Commentaires</h2>
+
+            <form method="post" th:action="@{'/fichiers/' + ${fichier.id} + '/commentaires'}"
+                  th:object="${commentaireForm}" class="formulaire-commentaire">
+                <textarea th:field="*{contenu}" placeholder="Ajouter un commentaire..." required></textarea>
+                <button type="submit" class="bouton" style="width: auto;">Envoyer</button>
+            </form>
+
+            <div th:if="${#lists.isEmpty(commentaires)}" class="message-vide">Aucun commentaire pour l'instant.</div>
+
+            <div th:each="c : ${commentaires}" class="commentaire">
+                <div class="auteur" th:text="${c.utilisateur.nom}"></div>
+                <div class="date" th:text="${#temporals.format(c.dateCommentaire, 'dd/MM/yyyy HH:mm')}"></div>
+                <p th:text="${c.contenu}"></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

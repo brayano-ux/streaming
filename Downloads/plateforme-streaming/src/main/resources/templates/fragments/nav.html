@@ -1,0 +1,6 @@
+<div th:fragment="nav" class="barre-nav">
+    <a href="/dashboard" class="logo">StreamPerso</a>
+    <form th:if="${#httpServletRequest.userPrincipal != null}" method="post" action="/api/auth/deconnexion" class="form-deconnexion">
+        <button type="submit" class="lien-deconnexion">Se deconnecter</button>
+    </form>
+</div>
